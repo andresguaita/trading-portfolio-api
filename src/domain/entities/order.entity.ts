@@ -16,19 +16,19 @@ export class Order {
   @Column({ name: 'userid' })
   userId: number;
 
-  @Column({ type: 'enum', enum: OrderSide })
+  @Column('varchar', { length: 10 })
   side: OrderSide;
 
-  @Column('decimal', { precision: 15, scale: 2 })
+  @Column('int')
   size: number;
 
-  @Column('decimal', { precision: 15, scale: 2, nullable: true })
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
   price: number;
 
-  @Column({ type: 'enum', enum: OrderType })
+  @Column('varchar', { length: 10 })
   type: OrderType;
 
-  @Column({ type: 'enum', enum: OrderStatus })
+  @Column('varchar', { length: 20 })
   status: OrderStatus;
 
   @Column({ type: 'timestamp' })

@@ -9,22 +9,22 @@ export class MarketData {
   @Column({ name: 'instrumentid' })
   instrumentId: number;
 
-  @Column('decimal', { precision: 15, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2 })
   high: number;
 
-  @Column('decimal', { precision: 15, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2 })
   low: number;
 
-  @Column('decimal', { precision: 15, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2 })
   open: number;
 
-  @Column('decimal', { precision: 15, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2 })
   close: number;
 
-  @Column('decimal', { precision: 15, scale: 2, name: 'previousclose' })
+  @Column('decimal', { precision: 10, scale: 2, name: 'previousclose' })
   previousClose: number;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'date', name: 'date' })
   datetime: Date;
 
   @ManyToOne(() => Instrument, instrument => instrument.marketData)
