@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User, Instrument, Order, MarketData } from './domain/entities';
+import { InstrumentsController } from './infrastructure/controllers/instruments.controller';
+import { SearchInstrumentsUseCase } from './application/use-cases/search-instruments.use-case';
+import { GetAllInstrumentsUseCase } from './application/use-cases/get-all-instruments.use-case';
+import { InstrumentRepository } from './infrastructure/repositories/instrument.repository';
 
 @Module({
   imports: [
@@ -19,7 +23,7 @@ import { User, Instrument, Order, MarketData } from './domain/entities';
         database: configService.get('DATABASE_NAME'),
         entities: [User, Instrument, Order, MarketData],
         synchronize: false,
-        logging: configService.get('NODE_ENV') === 'development',
+        logging: false,
         ssl: true,
         extra: {
           ssl: {
@@ -29,6 +33,16 @@ import { User, Instrument, Order, MarketData } from './domain/entities';
       }),
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([Instrument]),
+  ],
+  controllers: [InstrumentsController],
+  providers: [
+    SearchInstrumentsUseCase,
+    GetAllInstrumentsUseCase,
+    {
+      provide: 'IInstrumentRepository',
+      useClass: InstrumentRepository,
+    },
   ],
 })
 export class AppModule {}
