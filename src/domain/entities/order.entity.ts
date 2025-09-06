@@ -1,69 +1,44 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from './user.entity';
 import { Instrument } from './instrument.entity';
-
-export enum OrderSide {
-  BUY = 'BUY',
-  SELL = 'SELL',
-  CASH_IN = 'CASH_IN',
-  CASH_OUT = 'CASH_OUT',
-}
-
-export enum OrderType {
-  MARKET = 'MARKET',
-  LIMIT = 'LIMIT',
-}
-
-export enum OrderStatus {
-  NEW = 'NEW',
-  FILLED = 'FILLED',
-  REJECTED = 'REJECTED',
-  CANCELLED = 'CANCELLED',
-}
+import { OrderSide } from '../value-objects/order-side.enum';
+import { OrderType } from '../value-objects/order-type.enum';
+import { OrderStatus } from '../value-objects/order-status.enum';
 
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'instrumentId' })
+  @Column({ name: 'instrumentid' })
   instrumentId: number;
 
-  @Column({ name: 'userId' })
+  @Column({ name: 'userid' })
   userId: number;
 
-  @Column({
-    type: 'enum',
-    enum: OrderSide,
-  })
+  @Column({ type: 'enum', enum: OrderSide })
   side: OrderSide;
 
-  @Column('decimal', { precision: 18, scale: 2 })
+  @Column('decimal', { precision: 15, scale: 2 })
   size: number;
 
-  @Column('decimal', { precision: 18, scale: 2, nullable: true })
+  @Column('decimal', { precision: 15, scale: 2, nullable: true })
   price: number;
 
-  @Column({
-    type: 'enum',
-    enum: OrderType,
-  })
+  @Column({ type: 'enum', enum: OrderType })
   type: OrderType;
 
-  @Column({
-    type: 'enum',
-    enum: OrderStatus,
-  })
+  @Column({ type: 'enum', enum: OrderStatus })
   status: OrderStatus;
 
-  @CreateDateColumn()
+  @Column({ type: 'timestamp' })
   datetime: Date;
 
   @ManyToOne(() => User, user => user.orders)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'userid' })
   user: User;
 
   @ManyToOne(() => Instrument, instrument => instrument.orders)
-  @JoinColumn({ name: 'instrumentId' })
+  @JoinColumn({ name: 'instrumentid' })
   instrument: Instrument;
 }
