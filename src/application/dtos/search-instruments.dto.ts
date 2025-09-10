@@ -1,23 +1,20 @@
-import { IsString, IsNotEmpty, MinLength, IsOptional, IsInt, Min } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
+import { IsString, IsOptional, IsInt, Min, Max } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class SearchInstrumentsDto {
   @IsString()
-  @IsNotEmpty()
-  @MinLength(1)
   query: string;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
   @Type(() => Number)
   @IsInt()
   @Min(1)
   page?: number = 1;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 10;
 }

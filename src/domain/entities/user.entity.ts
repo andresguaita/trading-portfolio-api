@@ -7,11 +7,11 @@ export class User {
   id: number;
 
   @Column({ unique: true })
-  email: string;
+  email: string; 
 
   @Column({ name: 'accountnumber', unique: true })
   accountNumber: string;
 
-  @OneToMany(() => Order, order => order.user)
+  @OneToMany(() => Order, order => order.user, { eager: false })
   orders: Order[];
 }

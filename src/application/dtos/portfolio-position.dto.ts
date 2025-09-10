@@ -4,7 +4,9 @@ export class PortfolioPositionDto {
   name: string;
   quantity: number;
   currentPrice: number;
+  avgCost: number;
   totalValue: number;
+  totalReturn: number;
   dailyReturn: number;
   
   constructor(
@@ -13,7 +15,9 @@ export class PortfolioPositionDto {
     name: string,
     quantity: number,
     currentPrice: number,
+    avgCost: number,
     totalValue: number,
+    totalReturn: number,
     dailyReturn: number,
   ) {
     this.instrumentId = instrumentId;
@@ -21,7 +25,9 @@ export class PortfolioPositionDto {
     this.name = name;
     this.quantity = quantity;
     this.currentPrice = currentPrice;
+    this.avgCost = avgCost;
     this.totalValue = totalValue;
+    this.totalReturn = totalReturn;
     this.dailyReturn = dailyReturn;
   }
 }

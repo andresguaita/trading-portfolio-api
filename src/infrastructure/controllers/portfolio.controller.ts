@@ -4,7 +4,9 @@ import { PortfolioResponseDto } from '../../application/dtos/portfolio-response.
 
 @Controller('portfolio')
 export class PortfolioController {
-  constructor(private readonly getPortfolioUseCase: GetPortfolioUseCase) {}
+  constructor(
+    private readonly getPortfolioUseCase: GetPortfolioUseCase,
+  ) {}
 
   @Get(':userId')
   async getPortfolio(

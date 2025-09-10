@@ -11,7 +11,7 @@ export class GetAllInstrumentsUseCase {
   ) {}
 
   async execute(page: number, limit: number): Promise<PaginatedResponseDto<InstrumentResponseDto>> {
-    const { data: instruments, total } = await this.instrumentRepository.findAllPaginated(page, limit);
+    const { data: instruments, total } = await this.instrumentRepository.findAll(page, limit);
     
     const instrumentDtos = instruments.map(instrument => 
       new InstrumentResponseDto(
@@ -22,6 +22,8 @@ export class GetAllInstrumentsUseCase {
       )
     );
 
-    return new PaginatedResponseDto(instrumentDtos, total, page, limit);
+    const totalPages = Math.ceil(total / limit);
+    return new PaginatedResponseDto(instrumentDtos, total, page, limit, totalPages);
   }
 }
+

@@ -11,7 +11,7 @@ export class SearchInstrumentsUseCase {
   ) {}
 
   async execute(query: string, page: number, limit: number): Promise<PaginatedResponseDto<InstrumentResponseDto>> {
-    const { data: instruments, total } = await this.instrumentRepository.searchByTickerOrNamePaginated(query, page, limit);
+    const { data: instruments, total } = await this.instrumentRepository.search(query, page, limit);
     
     const instrumentDtos = instruments.map(instrument => 
       new InstrumentResponseDto(
@@ -22,6 +22,7 @@ export class SearchInstrumentsUseCase {
       )
     );
 
-    return new PaginatedResponseDto(instrumentDtos, total, page, limit);
+    const totalPages = Math.ceil(total / limit);
+    return new PaginatedResponseDto(instrumentDtos, total, page, limit, totalPages);
   }
 }

@@ -28,15 +28,12 @@ export class OrderRepository implements IOrderRepository {
     });
   }
 
-  async findFilledOrdersWithInstrumentsAndMarketData(userId: number): Promise<Order[]> {
-    return await this.orderRepo
-      .createQueryBuilder('o')
-      .leftJoinAndSelect('o.instrument', 'i')
-      .leftJoinAndSelect('i.marketData', 'md', 'md.date = (SELECT MAX(md2.date) FROM marketdata md2 WHERE md2.instrumentid = i.id)')
-      .where('o.userId = :userId', { userId })
-      .andWhere('o.status = :status', { status: OrderStatus.FILLED })
-      .orderBy('o.datetime', 'ASC')
-      .getMany();
+  async findFilledOrdersWithInstruments(userId: number): Promise<Order[]> {
+    return await this.orderRepo.find({
+      where: { userId, status: OrderStatus.FILLED },
+      relations: ['instrument'],
+      order: { datetime: 'ASC' }
+    });
   }
 
   async save(order: Order): Promise<Order> {

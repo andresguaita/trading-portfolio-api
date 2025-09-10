@@ -34,7 +34,7 @@ export class Order {
   @Column({ type: 'timestamp' })
   datetime: Date;
 
-  @ManyToOne(() => User, user => user.orders)
+  @ManyToOne(() => User, user => user.orders, { eager: false })
   @JoinColumn({ name: 'userid' })
   user: User;
 
