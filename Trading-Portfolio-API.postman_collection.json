@@ -1,0 +1,859 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Trading Portfolio API",
+		"description": "Colección completa para probar la API de Trading Portfolio desarrollada en NestJS.\n\n## Funcionalidades incluidas:\n- **Portfolio**: Consultar valor total y posiciones del usuario\n- **Instrumentos**: Buscar y listar instrumentos financieros\n- **Órdenes**: Crear órdenes de compra/venta (MARKET/LIMIT)\n- **Cancelar Órdenes**: Cancelar órdenes en estado NEW\n- **Efectivo**: Ingresar y retirar fondos (CASH_IN/CASH_OUT)\n\n## Variables configuradas:\n- `{{base_url}}`: http://localhost:3000/api\n- `{{user_id}}`: 1 (usuario de prueba)\n- `{{instrument_id}}`: 47 (PAMP - Pampa Holding S.A.)\n- `{{cash_instrument_id}}`: 66 (ARS - Peso Argentino)\n\n## Orden de ejecución recomendada:\n1. Portfolio - Ver estado inicial\n2. Instrumentos - Explorar activos disponibles\n3. Cash In - Agregar fondos\n4. Órdenes Market - Comprar/vender inmediatamente\n5. Órdenes Limit - Crear órdenes pendientes\n6. Cancelar Órdenes - Cancelar órdenes NEW\n7. Portfolio - Ver estado final",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "📊 Portfolio",
+			"item": [
+				{
+					"name": "Get Portfolio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Portfolio has required fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('userId');",
+									"    pm.expect(jsonData).to.have.property('totalAccountValue');",
+									"    pm.expect(jsonData).to.have.property('availableCash');",
+									"    pm.expect(jsonData).to.have.property('positions');",
+									"});",
+									"",
+									"pm.test('Positions have required fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.positions.length > 0) {",
+									"        const position = jsonData.positions[0];",
+									"        pm.expect(position).to.have.property('ticker');",
+									"        pm.expect(position).to.have.property('quantity');",
+									"        pm.expect(position).to.have.property('currentPrice');",
+									"        pm.expect(position).to.have.property('totalReturn');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/portfolio/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"portfolio",
+								"{{user_id}}"
+							]
+						},
+						"description": "Obtiene el portfolio completo del usuario incluyendo:\n- Valor total de la cuenta\n- Efectivo disponible\n- Posiciones con rendimientos totales y diarios"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados con el portfolio del usuario"
+		},
+		{
+			"name": "🔍 Instrumentos",
+			"item": [
+				{
+					"name": "Search Instruments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has pagination', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData).to.have.property('total');",
+									"    pm.expect(jsonData).to.have.property('page');",
+									"    pm.expect(jsonData).to.have.property('limit');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/instruments/search?query=PAMP&page=1&limit=5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"instruments",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "PAMP",
+									"description": "Buscar por ticker o nombre"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						},
+						"description": "Busca instrumentos por ticker o nombre con paginación"
+					},
+					"response": []
+				},
+				{
+					"name": "List All Instruments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has instruments', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    pm.expect(jsonData.data.length).to.be.greaterThan(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/instruments?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"instruments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Lista todos los instrumentos disponibles con paginación"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para buscar y listar instrumentos financieros"
+		},
+		{
+			"name": "💰 Efectivo",
+			"item": [
+				{
+					"name": "Cash In (Ingreso)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Order is FILLED', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('FILLED');",
+									"    pm.expect(jsonData.side).to.eql('CASH_IN');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{cash_instrument_id}},\n    \"side\": \"CASH_IN\",\n    \"type\": \"MARKET\",\n    \"quantity\": 50000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Ingresa efectivo a la cuenta del usuario"
+					},
+					"response": []
+				},
+				{
+					"name": "Cash Out (Retiro)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Order is FILLED', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('FILLED');",
+									"    pm.expect(jsonData.side).to.eql('CASH_OUT');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{cash_instrument_id}},\n    \"side\": \"CASH_OUT\",\n    \"type\": \"MARKET\",\n    \"quantity\": 10000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Retira efectivo de la cuenta del usuario"
+					},
+					"response": []
+				}
+			],
+			"description": "Operaciones de ingreso y retiro de efectivo"
+		},
+		{
+			"name": "📈 Órdenes Market",
+			"item": [
+				{
+					"name": "Buy Market - Por Cantidad",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Order is FILLED immediately', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('FILLED');",
+									"    pm.expect(jsonData.side).to.eql('BUY');",
+									"    pm.expect(jsonData.type).to.eql('MARKET');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{instrument_id}},\n    \"side\": \"BUY\",\n    \"type\": \"MARKET\",\n    \"quantity\": 10\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Compra 10 acciones de PAMP al precio de mercado"
+					},
+					"response": []
+				},
+				{
+					"name": "Buy Market - Por Monto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Order calculates quantity from amount', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('FILLED');",
+									"    pm.expect(jsonData.quantity).to.be.greaterThan(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{instrument_id}},\n    \"side\": \"BUY\",\n    \"type\": \"MARKET\",\n    \"amount\": 10000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Compra acciones de PAMP por $10,000 pesos (calcula cantidad automáticamente)"
+					},
+					"response": []
+				},
+				{
+					"name": "Sell Market",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Sell order executed', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('FILLED');",
+									"    pm.expect(jsonData.side).to.eql('SELL');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{instrument_id}},\n    \"side\": \"SELL\",\n    \"type\": \"MARKET\",\n    \"quantity\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Vende 5 acciones de PAMP al precio de mercado"
+					},
+					"response": []
+				}
+			],
+			"description": "Órdenes de mercado que se ejecutan inmediatamente"
+		},
+		{
+			"name": "📊 Órdenes Limit",
+			"item": [
+				{
+					"name": "Buy Limit Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Limit order created with NEW status', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('NEW');",
+									"    pm.expect(jsonData.type).to.eql('LIMIT');",
+									"    pm.expect(jsonData.price).to.eql('900.00');",
+									"    ",
+									"    // Guardar order ID para cancelación",
+									"    pm.collectionVariables.set('limit_order_id', jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{instrument_id}},\n    \"side\": \"BUY\",\n    \"type\": \"LIMIT\",\n    \"quantity\": 10,\n    \"price\": 900.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Crea una orden límite de compra a $900 por acción (estado NEW)"
+					},
+					"response": []
+				},
+				{
+					"name": "Sell Limit Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Sell limit order created', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('NEW');",
+									"    pm.expect(jsonData.side).to.eql('SELL');",
+									"    pm.expect(jsonData.price).to.eql('1000.00');",
+									"    ",
+									"    // Guardar order ID para cancelación",
+									"    pm.collectionVariables.set('sell_limit_order_id', jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{instrument_id}},\n    \"side\": \"SELL\",\n    \"type\": \"LIMIT\",\n    \"quantity\": 5,\n    \"price\": 1000.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Crea una orden límite de venta a $1000 por acción (estado NEW)"
+					},
+					"response": []
+				}
+			],
+			"description": "Órdenes límite que quedan pendientes hasta alcanzar el precio objetivo"
+		},
+		{
+			"name": "❌ Cancelar Órdenes",
+			"item": [
+				{
+					"name": "Cancel Limit Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Order is cancelled', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('CANCELLED');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/orders/{{limit_order_id}}/cancel?userId={{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"{{limit_order_id}}",
+								"cancel"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								}
+							]
+						},
+						"description": "Cancela la orden límite creada anteriormente (usa variable limit_order_id)"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Already Cancelled Order (Error)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error message about order status', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('Solo se pueden cancelar órdenes con estado NEW');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/orders/{{limit_order_id}}/cancel?userId={{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"{{limit_order_id}}",
+								"cancel"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								}
+							]
+						},
+						"description": "Intenta cancelar una orden ya cancelada (debe fallar con error 400)"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Order - Wrong User (Error)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error message about permissions', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('No tienes permisos');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/orders/{{sell_limit_order_id}}/cancel?userId=2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"{{sell_limit_order_id}}",
+								"cancel"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "2",
+									"description": "Usuario diferente al propietario"
+								}
+							]
+						},
+						"description": "Intenta cancelar una orden de otro usuario (debe fallar con error 400)"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Non-Existent Order (Error)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test('Error message about not found', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('no encontrada');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/orders/99999/cancel?userId={{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"99999",
+								"cancel"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								}
+							]
+						},
+						"description": "Intenta cancelar una orden inexistente (debe fallar con error 404)"
+					},
+					"response": []
+				}
+			],
+			"description": "Funcionalidad para cancelar órdenes y casos de error"
+		},
+		{
+			"name": "⚠️ Casos de Error",
+			"item": [
+				{
+					"name": "Buy - Insufficient Funds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error message about insufficient funds', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('Fondos insuficientes');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{instrument_id}},\n    \"side\": \"BUY\",\n    \"type\": \"MARKET\",\n    \"quantity\": 10000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Intenta comprar más acciones de las que permite el efectivo disponible"
+					},
+					"response": []
+				},
+				{
+					"name": "Sell - Insufficient Shares",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test('Error message about insufficient shares', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('Acciones insuficientes');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"instrumentId\": {{instrument_id}},\n    \"side\": \"SELL\",\n    \"type\": \"MARKET\",\n    \"quantity\": 10000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Intenta vender más acciones de las que posee el usuario"
+					},
+					"response": []
+				}
+			],
+			"description": "Casos de error para probar las validaciones de la API"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "instrument_id",
+			"value": "47",
+			"type": "string",
+			"description": "PAMP - Pampa Holding S.A."
+		},
+		{
+			"key": "cash_instrument_id",
+			"value": "66",
+			"type": "string",
+			"description": "ARS - Peso Argentino"
+		},
+		{
+			"key": "limit_order_id",
+			"value": "",
+			"type": "string",
+			"description": "Se establece automáticamente al crear orden límite"
+		},
+		{
+			"key": "sell_limit_order_id",
+			"value": "",
+			"type": "string",
+			"description": "Se establece automáticamente al crear orden límite de venta"
+		}
+	]
+}

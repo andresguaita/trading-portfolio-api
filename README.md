@@ -299,10 +299,47 @@ curl -X PUT "http://localhost:3000/api/orders/82/cancel?userId=1"
 - **CASH_IN**: Ingreso de efectivo
 - **CASH_OUT**: Retiro de efectivo
 
+## Colección de Postman
+
+### Importar Colección
+
+1. **Descargar archivos:**
+   - `Trading-Portfolio-API.postman_collection.json` - Colección completa
+   - `Trading-Portfolio-API.postman_environment.json` - Variables de entorno
+
+2. **Importar en Postman:**
+   - Abrir Postman
+   - File → Import → Seleccionar ambos archivos JSON
+   - Seleccionar environment "Trading Portfolio API - Local"
+
+### Qué incluye la colección:
+
+- **Portfolio** - Ver estado de cuenta y posiciones
+- **Instrumentos** - Buscar y listar activos
+- **Efectivo** - Ingresar/retirar fondos (CASH_IN/CASH_OUT)
+- **Órdenes Market** - Comprar/vender inmediatamente
+- **Órdenes Limit** - Crear órdenes pendientes
+- **Cancelar Órdenes** - Cancelar órdenes NEW
+- **Casos de Error** - Probar validaciones
+
+### Tests automáticos incluidos:
+- Validación de códigos de estado HTTP
+- Verificación de estructura de respuestas
+- Pruebas de casos de error
+- Variables automáticas entre requests
+
+### Orden de ejecución recomendada:
+1. **Portfolio** - Ver estado inicial
+2. **Cash In** - Agregar fondos
+3. **Órdenes Market** - Comprar/vender
+4. **Órdenes Limit** - Crear pendientes
+5. **Cancelar Órdenes** - Cancelar NEW
+6. **Portfolio** - Ver estado final
+
 ## Testing
 
 ```bash
-# Ejecutar tests
+# Ejecutar tests unitarios
 npm test
 
 # Con Docker
