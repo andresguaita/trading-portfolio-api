@@ -21,15 +21,15 @@ export class BuyOrderValidator implements OrderValidator {
 
       if (context.currentCash < requiredAmount) {
         errors.push(
-          `Fondos insuficientes. Disponible: $${context.currentCash.toFixed(2)}, ` +
-          `Requerido: $${requiredAmount.toFixed(2)}`
+          `Insufficient funds. Available: $${context.currentCash.toFixed(2)}, ` +
+          `Required: $${requiredAmount.toFixed(2)}`
         );
       }
 
       if (requiredAmount > context.currentCash * 0.5) {
         warnings.push(
-          `Esta orden utilizará ${((requiredAmount / context.currentCash) * 100).toFixed(1)}% ` +
-          `de tu efectivo disponible`
+          `This order will use ${((requiredAmount / context.currentCash) * 100).toFixed(1)}% ` +
+          `of your available cash`
         );
       }
     }

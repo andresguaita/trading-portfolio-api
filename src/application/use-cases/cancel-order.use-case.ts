@@ -14,16 +14,16 @@ export class CancelOrderUseCase {
     const order = await this.orderRepository.findById(orderId);
     
     if (!order) {
-      throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
+      throw new NotFoundException(`Order with id ${orderId} not found`);
     }
 
     if (order.userId !== userId) {
-      throw new BadRequestException('No tienes permisos para cancelar esta orden');
+      throw new BadRequestException('You do not have permission to cancel this order');
     }
 
     if (order.status !== OrderStatus.NEW) {
       throw new BadRequestException(
-        `Solo se pueden cancelar órdenes con estado NEW. Estado actual: ${order.status}`
+        `Only orders with NEW status can be cancelled. Current status: ${order.status}`
       );
     }
 

@@ -31,7 +31,7 @@ import { LimitOrderValidator } from './application/validators/limit-order.valida
         const isProduction = configService.get('NODE_ENV') === 'production';
         const host = configService.get('DATABASE_HOST');
         
-        // Si es una conexión externa (no localhost/db), usar SSL
+        // If it's an external connection (not localhost/db), use SSL
         const requireSsl = host && !['localhost', '127.0.0.1', 'db'].includes(host);
         
         return {

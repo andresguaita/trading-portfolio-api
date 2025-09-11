@@ -18,15 +18,15 @@ export class SellOrderValidator implements OrderValidator {
 
       if (context.availableShares < quantityToSell) {
         errors.push(
-          `Acciones insuficientes de ${context.instrument?.ticker || 'instrumento'}. ` +
-          `Disponible: ${context.availableShares}, Requerido: ${quantityToSell}`
+          `Insufficient shares of ${context.instrument?.ticker || 'instrument'}. ` +
+          `Available: ${context.availableShares}, Required: ${quantityToSell}`
         );
       }
 
       if (quantityToSell > context.availableShares * 0.8) {
         warnings.push(
-          `Esta venta representará ${((quantityToSell / context.availableShares) * 100).toFixed(1)}% ` +
-          `de tu posición en ${context.instrument?.ticker || 'este instrumento'}`
+          `This sale will represent ${((quantityToSell / context.availableShares) * 100).toFixed(1)}% ` +
+          `of your position in ${context.instrument?.ticker || 'this instrument'}`
         );
       }
     }

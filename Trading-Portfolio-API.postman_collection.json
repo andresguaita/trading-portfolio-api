@@ -580,7 +580,7 @@
 									"",
 									"pm.test('Error message about order status', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.include('Solo se pueden cancelar órdenes con estado NEW');",
+									"    pm.expect(jsonData.message).to.include('Only orders with NEW status can be cancelled');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -624,7 +624,7 @@
 									"",
 									"pm.test('Error message about permissions', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.include('No tienes permisos');",
+									"    pm.expect(jsonData.message).to.include('You do not have permission');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -669,7 +669,7 @@
 									"",
 									"pm.test('Error message about not found', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.include('no encontrada');",
+									"    pm.expect(jsonData.message).to.include('not found');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -719,7 +719,7 @@
 									"",
 									"pm.test('Error message about insufficient funds', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.include('Fondos insuficientes');",
+									"    pm.expect(jsonData.message).to.include('Insufficient funds');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -764,7 +764,7 @@
 									"",
 									"pm.test('Error message about insufficient shares', function () {",
 									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.include('Acciones insuficientes');",
+									"    pm.expect(jsonData.message).to.include('Insufficient shares');",
 									"});"
 								],
 								"type": "text/javascript"
