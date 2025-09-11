@@ -26,4 +26,3 @@ export class GetAllInstrumentsUseCase {
     return new PaginatedResponseDto(instrumentDtos, total, page, limit, totalPages);
   }
 }
-

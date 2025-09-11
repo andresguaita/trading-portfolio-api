@@ -12,6 +12,13 @@ export class OrderRepository implements IOrderRepository {
     private readonly orderRepo: Repository<Order>,
   ) {}
 
+  async findById(id: number): Promise<Order | null> {
+    return await this.orderRepo.findOne({
+      where: { id },
+      relations: ['instrument']
+    });
+  }
+
   async findByUserIdAndStatus(userId: number, status: OrderStatus): Promise<Order[]> {
     return await this.orderRepo.find({
       where: { userId, status },

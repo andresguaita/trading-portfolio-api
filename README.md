@@ -249,6 +249,38 @@ curl -X POST /api/orders \
 }
 ```
 
+### Cancelar Órdenes
+
+**PUT** `/api/orders/:orderId/cancel?userId=<userId>`
+
+Cancela una orden existente. Solo se pueden cancelar órdenes con estado NEW.
+
+```bash
+# Cancelar orden con ID 82 del usuario 1
+curl -X PUT "http://localhost:3000/api/orders/82/cancel?userId=1"
+```
+
+**Respuesta exitosa:**
+```json
+{
+  "id": 82,
+  "userId": 1,
+  "instrumentId": 47,
+  "side": "BUY",
+  "type": "LIMIT",
+  "status": "CANCELLED",
+  "quantity": 5,
+  "price": "920.00",
+  "executedPrice": 0,
+  "datetime": "2025-09-11T00:34:17.902Z"
+}
+```
+
+**Validaciones:**
+- Solo órdenes con estado NEW pueden cancelarse
+- Solo el propietario de la orden puede cancelarla
+- La orden debe existir
+
 ## Estados y Tipos de Orden
 
 ### Estados (Status)

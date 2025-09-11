@@ -9,6 +9,7 @@ import { SearchInstrumentsUseCase } from './application/use-cases/search-instrum
 import { GetAllInstrumentsUseCase } from './application/use-cases/get-all-instruments.use-case';
 import { GetPortfolioUseCase } from './application/use-cases/get-portfolio.use-case';
 import { CreateOrderUseCase } from './application/use-cases/create-order.use-case';
+import { CancelOrderUseCase } from './application/use-cases/cancel-order.use-case';
 import { InstrumentRepository } from './infrastructure/repositories/instrument.repository';
 import { OrderRepository } from './infrastructure/repositories/order.repository';
 import { MarketDataRepository } from './infrastructure/repositories/market-data.repository';
@@ -26,18 +27,26 @@ import { LimitOrderValidator } from './application/validators/limit-order.valida
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DATABASE_HOST'),
-        port: configService.get('DATABASE_PORT'),
-        username: configService.get('DATABASE_USERNAME'),
-        password: configService.get('DATABASE_PASSWORD'),
-        database: configService.get('DATABASE_NAME'),
-            entities: [User, Instrument, Order, MarketData],
-        synchronize: false,
-        logging: false,
-        ssl: false
-      }),
+      useFactory: (configService: ConfigService) => {
+        const isProduction = configService.get('NODE_ENV') === 'production';
+        const host = configService.get('DATABASE_HOST');
+        
+        // Si es una conexión externa (no localhost/db), usar SSL
+        const requireSsl = host && !['localhost', '127.0.0.1', 'db'].includes(host);
+        
+        return {
+          type: 'postgres',
+          host: configService.get('DATABASE_HOST'),
+          port: configService.get('DATABASE_PORT'),
+          username: configService.get('DATABASE_USERNAME'),
+          password: configService.get('DATABASE_PASSWORD'),
+          database: configService.get('DATABASE_NAME'),
+          entities: [User, Instrument, Order, MarketData],
+          synchronize: false,
+          logging: false,
+          ssl: requireSsl ? { rejectUnauthorized: false } : false
+        };
+      },
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([Instrument, Order, MarketData, User]),
@@ -48,6 +57,7 @@ import { LimitOrderValidator } from './application/validators/limit-order.valida
     GetAllInstrumentsUseCase,
     GetPortfolioUseCase,
     CreateOrderUseCase,
+    CancelOrderUseCase,
     OrderValidationService,
     BasicOrderValidator,
     BuyOrderValidator,
