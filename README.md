@@ -1,73 +1,277 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Trading Portfolio API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**API REST desarrollada en Node.js/NestJS para gestión de portafolios de trading con soporte para órdenes de compra/venta y manejo de efectivo.**
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Funcionalidades
 
-## Description
+- **Portfolio**: Consulta valor total de cuenta, efectivo disponible y posiciones con rendimientos
+- **Búsqueda de Instrumentos**: Buscar activos por ticker o nombre con paginación
+- **Gestión de Órdenes**: Creación de órdenes MARKET/LIMIT para BUY/SELL/CASH_IN/CASH_OUT
+- **Gestión de Efectivo**: Ingreso y retiro de fondos modelado como instrumento MONEDA
+- **Market Data**: Precios actuales e históricos para cálculo de rendimientos
+- **Validaciones**: Control de fondos suficientes, acciones disponibles y tipos de orden
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Instalación y Ejecución
 
-## Installation
+### Opción 1: Docker (RECOMENDADO)
+
+**Stack completo con un solo comando:**
 
 ```bash
-$ npm install
+# Clonar repositorio
+git clone trading-portfolio-api
+cd trading-portfolio-api
+
+# Levantar PostgreSQL + API con datos de prueba
+docker-compose up --build
 ```
 
-## Running the app
+**API disponible en:** http://localhost:3000/api
+
+**¿Qué incluye Docker?**
+- PostgreSQL local con 66 instrumentos argentinos
+- 4 usuarios de prueba con datos realistas  
+- Órdenes históricas y market data
+- Sin configuraciones adicionales
+
+### Opción 2: Instalación Manual
+
+**Requisitos:**
+- Node.js 18+ 
+- PostgreSQL 12+
+- npm o yarn
+
+**Pasos:**
+
+1. **Instalar dependencias:**
+```bash
+npm install
+```
+
+2. **Configurar base de datos:**
+```bash
+# Crear base de datos PostgreSQL
+createdb trading_portfolio_db
+
+# Ejecutar script de inicialización
+psql -d trading_portfolio_db -f database/init.sql
+```
+
+3. **Variables de entorno (.env):**
+```env
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=tu_usuario
+DATABASE_PASSWORD=tu_password
+DATABASE_NAME=trading_portfolio_db
+NODE_ENV=development
+```
+
+4. **Ejecutar:**
+```bash
+# Desarrollo
+npm run start:dev
+
+# Producción  
+npm run build && npm run start:prod
+```
+
+## API Endpoints
+
+### Portfolio
+
+**GET** `/api/portfolio/:userId`
+
+Obtiene información completa del portfolio de un usuario.
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+curl /api/portfolio/1
 ```
 
-## Test
+**Respuesta:**
+```json
+{
+  "userId": 1,
+  "totalValue": 1200000,
+  "availableCash": 753000,
+  "positions": [
+    {
+      "instrumentId": 47,
+      "ticker": "PAMP",
+      "name": "Pampa Holding S.A.",
+      "quantity": 40,
+      "averagePrice": 930.00,
+      "currentPrice": 925.85,
+      "marketValue": 37034.00,
+      "totalReturn": -0.45,
+      "dailyReturn": 0.44
+    }
+  ]
+}
+```
+
+### Búsqueda de Instrumentos
+
+**GET** `/api/instruments/search?query=<query>&page=<page>&limit=<limit>`
+
+Busca instrumentos por ticker o nombre.
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+curl "/api/instruments/search?query=PAMP&page=1&limit=5"
 ```
 
-## Support
+**Respuesta:**
+```json
+{
+  "data": [
+    {
+      "id": 47,
+      "ticker": "PAMP",
+      "name": "Pampa Holding S.A.",
+      "type": "ACCIONES"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 5,
+  "totalPages": 1
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Listar Instrumentos
 
-## Stay in touch
+**GET** `/api/instruments?page=<page>&limit=<limit>`
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Lista todos los instrumentos con paginación.
 
-## License
+```bash
+curl "/api/instruments?page=1&limit=10"
+```
 
-Nest is [MIT licensed](LICENSE).
+### Crear Órdenes
+
+**POST** `/api/orders`
+
+Crea una nueva orden de trading.
+
+#### CASH_IN (Ingreso de efectivo)
+```bash
+curl -X POST /api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "instrumentId": 66,
+    "side": "CASH_IN", 
+    "type": "MARKET",
+    "quantity": 50000
+  }'
+```
+
+#### CASH_OUT (Retiro de efectivo)  
+```bash
+curl -X POST /api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "instrumentId": 66,
+    "side": "CASH_OUT",
+    "type": "MARKET", 
+    "quantity": 10000
+  }'
+```
+
+#### COMPRA por cantidad
+```bash
+curl -X POST /api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "instrumentId": 47,
+    "side": "BUY",
+    "type": "MARKET",
+    "quantity": 10
+  }'
+```
+
+#### COMPRA por monto
+```bash
+curl -X POST /api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1, 
+    "instrumentId": 47,
+    "side": "BUY",
+    "type": "MARKET",
+    "amount": 10000
+  }'
+```
+
+#### VENTA
+```bash
+curl -X POST /api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "instrumentId": 47, 
+    "side": "SELL",
+    "type": "MARKET",
+    "quantity": 5
+  }'
+```
+
+#### ORDEN LÍMITE  
+```bash
+curl -X POST /api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "instrumentId": 47,
+    "side": "BUY", 
+    "type": "LIMIT",
+    "quantity": 10,
+    "price": 900.00
+  }'
+```
+
+**Respuesta de Orden:**
+```json
+{
+  "id": 12,
+  "userId": 1,
+  "instrumentId": 47,
+  "side": "BUY",
+  "type": "MARKET", 
+  "status": "FILLED",
+  "quantity": 10,
+  "price": 925.85,
+  "executedPrice": 925.85,
+  "datetime": "2023-07-14T10:30:00.000Z"
+}
+```
+
+## Estados y Tipos de Orden
+
+### Estados (Status)
+- **NEW**: Orden límite creada, pendiente de ejecución
+- **FILLED**: Orden ejecutada exitosamente  
+- **REJECTED**: Orden rechazada (fondos/acciones insuficientes)
+- **CANCELLED**: Orden cancelada por el usuario
+
+### Tipos (Type)
+- **MARKET**: Ejecución inmediata al precio de mercado
+- **LIMIT**: Ejecución condicionada a precio específico
+
+### Lados (Side)
+- **BUY**: Compra de acciones
+- **SELL**: Venta de acciones
+- **CASH_IN**: Ingreso de efectivo
+- **CASH_OUT**: Retiro de efectivo
+
+## Testing
+
+```bash
+# Ejecutar tests
+npm test
+
+# Con Docker
+docker-compose exec app npm test

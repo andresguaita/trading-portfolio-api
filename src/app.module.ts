@@ -36,12 +36,7 @@ import { LimitOrderValidator } from './application/validators/limit-order.valida
             entities: [User, Instrument, Order, MarketData],
         synchronize: false,
         logging: false,
-        ssl: true,
-        extra: {
-          ssl: {
-            rejectUnauthorized: false
-          }
-        }
+        ssl: false
       }),
       inject: [ConfigService],
     }),

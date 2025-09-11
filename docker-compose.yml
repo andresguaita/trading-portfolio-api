@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: trading-portfolio-db
+    environment:
+      POSTGRES_DB: trading_portfolio_db
+      POSTGRES_USER: trading_user
+      POSTGRES_PASSWORD: trading_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    
+  app:
+    build: .
+    container_name: trading-portfolio-api
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=trading_user
+      - DATABASE_PASSWORD=trading_password
+      - DATABASE_NAME=trading_portfolio_db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

@@ -1,0 +1,13 @@
+node_modules
+dist
+.env
+.git
+.gitignore
+.npmrc
+package-lock.json
+README.md
+Dockerfile
+docker-compose.yml
+*.log
+coverage
+.nyc_output
